@@ -88,37 +88,6 @@ $ python manage.py run_grpc_server grpc_book_service
 
 ```
 
-## Running REST Server with gRPC:
-
-This is a way with golang http reverse proxy gateway mentioned at https://github.com/grpc-ecosystem/grpc-gateway
-```sh
-# GoLang Gateway out: 
-$ protoc -I/usr/local/include -I. -I./grpc_book_service/grpc_protos -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis --grpc-gateway_out=logtostderr=true:. ./grpc_book_service/grpc_protos/app.proto
-```
-
-Another way using https://github.com/RussellLuo/grpc-pytools/
-```sh
-
-# Generate AST File
-$ python -m grpc_tools.protoc -I. --pytools-ast_out=grpc_book_service/grpc_rest/app_ast.json grpc_book_service/grpc_protos/app.proto
-
-# Generate Pythonic Services based on Flask
-$ python -m grpc_pytools.pythonic --proto-ast-file=grpc_book_service/grpc_protos/app_ast.json --pb2-module-name=grpc_book_service/grpc_protos/app_pb2 > grpc_book_service/grpc_rest/services.py
-
-# Generate Marshmallow Schemas
-$ python -m grpc_pytools.marshmallow --proto-ast-file=grpc_book_service/grpc_protos/app_ast.json --pb2-module-name=grpc_book_service/grpc_protos/app_pb2 > grpc_book_service/grpc_rest/schemas.py
-
-# Generate RESTart APIs
-$ python -m grpc_pytools.restart --proto-ast-file=grpc_book_service/grpc_protos/app_ast.json --pb2-module-name=grpc_book_service/grpc_protos/app_pb2 --grpc-server=localhost:50051 > grpc_book_service/grpc_rest/apis.py
-# Modify the api path in <grpc_book_service/grpc_rest/apis.py> as per OpenAPI Spec
-
-# Run the HTTP/1.1 server
-$ restart grpc_book_service.grpc_rest.apis:api -p 60066
-
-# Try cURL
-$ curl -i -H 'Content-Type: application/json' -X POST http://localhost:60066/grpc_book_service/get_book_post -d '{"isbn": 1}'
-```
-
 ## Connecting to GRPC Using ServiceClient
 
 ```python
