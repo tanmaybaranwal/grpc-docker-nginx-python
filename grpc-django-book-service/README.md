@@ -2,6 +2,36 @@
 
 gRPC Integration with Django.
 
+This project is tweaked version of https://github.com/tanmaybaranwal/grpc-django-book-service, to implements SSL for server and client.
+
+## Specific to this Django App Workaround:
+
+#### Create a certificate
+
+Make sure you provide a CN:
+
+```sh
+$ openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ./cert/server.key -out ./cert/server.cert  -subj '/CN=djangoserver'
+```
+
+### Export ENV VARS for server:
+
+```sh
+$ export SSH_KEY='./cert/server.key'
+$ export SSH_CERT='./cert/server.cert'
+$ export PORT=50051
+```
+
+### Export ENV VARS for client:
+
+```sh
+$ export SSL_CERT='./cert/server.cert'
+$ export SRV_URL='djangoserver'
+$ export SRV_PORT=50051
+```
+
+## Django Book Service App:
+
 This project uses internal automation and build tools. The
 concerned files and folders in project are:
 
@@ -92,9 +122,13 @@ $ curl -i -H 'Content-Type: application/json' -X POST http://localhost:60066/grp
 ## Connecting to GRPC Using ServiceClient
 
 ```python
+import os
+
 from grpc_book_service.grpc_protos import app_pb2, app_pb2_grpc
 from grpc_book_service.grpc_utils.service_client import ServiceClient
-books_service_client = ServiceClient(app_pb2_grpc, 'GRPCBookServiceStub', 'localhost', 50051)
+
+SSL_CERT = os.environ.get('SSL_CERT')
+books_service_client = ServiceClient(app_pb2_grpc, 'GRPCBookServiceStub', 'djangoserver', 50051, secure=True, cert=SSL_CERT)
 response = books_service_client.GetBookPost(app_pb2.GetBookRequest(isbn=1))
 
 # <response:>
