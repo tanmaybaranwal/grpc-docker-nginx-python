@@ -31,7 +31,7 @@ Pygments==2.2.0
 pykerberos==1.2.1
 python-dateutil==2.7.3
 pytz==2018.4
-PyYAML==3.11
+PyYAML==5.4
 requests==2.19.1
 scandir==1.7
 simplegeneric==0.8.1
